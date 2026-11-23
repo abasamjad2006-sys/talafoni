@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#3730a3">
+  <meta name="description" content="تلفوني - سوق بيع وشراء الأجهزة المستعملة">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>تلفوني</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial;background:#f7f7fb;color:#17172b}
+    header{background:#3730a3;color:white;padding:22px 16px;border-radius:0 0 22px 22px}
+    header h1{margin:0 0 6px;font-size:28px}header p{margin:0;opacity:.9}
+    main{max-width:760px;margin:18px auto;padding:0 14px}
+    .search,.panel{background:white;border:1px solid #e5e5ef;border-radius:16px;padding:14px;margin-bottom:14px}
+    input,select,textarea,button{font:inherit;width:100%;padding:12px;border:1px solid #d8d8e5;border-radius:10px;margin:6px 0}
+    button{background:#3730a3;color:white;border:0;font-weight:700;cursor:pointer}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .item{background:white;border:1px solid #e5e5ef;border-radius:14px;padding:14px}
+    .price{color:#3730a3;font-weight:800;font-size:20px}.muted{color:#666}
+    .tag{display:inline-block;background:#eef2ff;color:#3730a3;padding:4px 9px;border-radius:20px;font-size:12px}
+    form{display:none}form.show{display:block}
+  </style>
+</head>
+<body>
+<header><h1>تلفوني</h1><p>بيع وشراء الأجهزة المستعملة بسهولة</p></header>
+<main>
+  <section class="search">
+    <input id="q" placeholder="ابحث عن جهاز..." oninput="render()">
+    <select id="cat" onchange="render()"><option value="">كل الأقسام</option><option>هواتف</option><option>حواسيب</option><option>أجهزة ألعاب</option><option>إلكترونيات أخرى</option></select>
+    <button onclick="document.getElementById('form').classList.toggle('show')">＋ أضف إعلانك</button>
+  </section>
+  <form id="form" class="panel">
+    <h2>إضافة إعلان</h2>
+    <input id="title" required placeholder="اسم الجهاز">
+    <select id="category"><option>هواتف</option><option>حواسيب</option><option>أجهزة ألعاب</option><option>إلكترونيات أخرى</option></select>
+    <input id="price" type="number" min="0" required placeholder="السعر بالدينار العراقي">
+    <input id="city" required placeholder="المحافظة / المدينة">
+    <select id="condition"><option>مستعمل - ممتاز</option><option>مستعمل - جيد</option><option>شبه جديد</option></select>
+    <input id="phone" type="tel" required placeholder="رقم هاتف البائع (إلزامي)">
+    <textarea id="description" placeholder="تفاصيل الجهاز"></textarea>
+    <button type="submit">حفظ الإعلان على هذا الجهاز</button>
+    <p class="muted">هذه نسخة تجريبية: الإعلانات محفوظة محلياً على نفس المتصفح فقط، وليست منشورة للآخرين.</p>
+  </form>
+  <h2>أحدث الإعلانات</h2>
+  <div id="list" class="grid"></div>
+</main>
+<script>
+const sample=[
+ {title:"هاتف سامسونگ",category:"هواتف",price:250000,city:"بغداد",condition:"مستعمل - جيد",description:"مثال توضيحي"},
+ {title:"لابتوب",category:"حواسيب",price:450000,city:"بابل",condition:"شبه جديد",description:"مثال توضيحي"}
+];
+function all(){try{return JSON.parse(localStorage.getItem("talafoni_ads")||"null")||sample}catch(e){return sample}}
+function render(){let q=document.getElementById("q").value.trim().toLowerCase(),c=document.getElementById("cat").value;
+let items=all().filter(x=>(!q||x.title.toLowerCase().includes(q)||x.city.toLowerCase().includes(q))&&(!c||x.category===c));
+document.getElementById("list").innerHTML=items.map(x=>`<article class="item"><span class="tag">${x.category}</span><h3>${x.title}</h3><div class="price">${Number(x.price).toLocaleString("en-US")} د.ع</div><p class="muted">${x.city} · ${x.condition}</p><p>${x.description||""}</p></article>`).join("")||"<p>لا توجد إعلانات مطابقة.</p>"}
+document.getElementById("form").addEventListener("submit",e=>{e.preventDefault();let ads=all();ads.unshift({title:title.value,category:category.value,price:Number(price.value),city:city.value,condition:condition.value,phone:phone.value,description:description.value});localStorage.setItem("talafoni_ads",JSON.stringify(ads));e.target.reset();e.target.classList.remove("show");render();alert("تم حفظ الإعلان على هذا الجهاز فقط")});
+render();
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script>
+</body></html>

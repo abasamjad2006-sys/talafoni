@@ -1,0 +1,11 @@
+{
+  "name": "تلفوني",
+  "short_name": "تلفوني",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f7fb",
+  "theme_color": "#3730a3",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": []
+}
